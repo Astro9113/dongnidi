@@ -59,23 +59,30 @@ export default {
 
     getBookUpdate () {
       let localShelf,
-        that = this
-      Indicator.open()
-      api.getUpdate(this.getBookList()).then(response => {
-        localShelf = util.getLocalStroageData('followBookList')
-        response.data.forEach((book) => {
-          Object.assign(book, localShelf[book._id])
-            // console.log('book.cover: ', book.cover);
-          if (book.cover && book.cover.split('/agent/')[0].length === 0) {
-              book.cover = util.staticPath + book.cover
-          }
-          that.books.push(book)
-        })
-        Indicator.close()
-      }).catch(err => {
-        console.log(err)
-        Indicator.close()
-      })
+        that = this;
+
+      let bookList = this.getBookList();
+      if (bookList.length > 0) {
+          Indicator.open();
+
+          api.getUpdate(bookList).then(response => {
+              localShelf = util.getLocalStroageData('followBookList');
+              response.data.forEach((book) => {
+                  Object.assign(book, localShelf[book._id]);
+                  // console.log('book.cover: ', book.cover);
+                  if (book.cover && book.cover.split('/agent/')[0].length === 0) {
+                      book.cover = util.staticPath + book.cover
+                  }
+                  that.books.push(book)
+              });
+              Indicator.close()
+          }).catch(err => {
+              console.log(err);
+              Indicator.close()
+          })
+      } else {
+          console.log('bookList: ', bookList.length);
+      }
     },
 
     readbook (book) {
